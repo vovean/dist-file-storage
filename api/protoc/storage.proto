@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package dist_file_storage;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = ".;api";
+
+service StorageService {
+  rpc StoreV1 (stream StoreV1Request) returns (google.protobuf.Empty);
+
+  rpc DownloadV1 (DownloadV1Request) returns (stream DownloadV1Response);
+}
+
+message StoreRequestMetadata {
+  string path = 1;
+}
+
+message StoreV1Request {
+  oneof data {
+    StoreRequestMetadata meta = 1;
+    bytes content = 2;
+  }
+}
+
+message DownloadV1Request {
+  string path = 1;
+}
+
+message DownloadV1Response {
+  bytes data = 1;
+}
