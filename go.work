@@ -2,8 +2,8 @@ go 1.21.3
 
 use (
 	./api
+	./fms
 	./gateway
 	./pkg
 	./storage
-	./fms
 )
