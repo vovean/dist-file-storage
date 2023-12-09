@@ -13,6 +13,8 @@ service StorageService {
   rpc ServeV1 (ServeV1Request) returns (stream ServeV1Response);
 
   rpc InfoV1 (google.protobuf.Empty) returns (InfoV1Response);
+
+  rpc DeleteV1 (DeleteV1Request) returns (google.protobuf.Empty);
 }
 
 message StoreRequestMetadata {
@@ -36,4 +38,8 @@ message ServeV1Response {
 
 message InfoV1Response {
   uint64 size = 1;
+}
+
+message DeleteV1Request {
+  string path = 1;
 }

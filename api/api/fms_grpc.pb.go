@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	FileManagementService_InitFileUploadV1_FullMethodName       = "/dist_file_storage.FileManagementService/InitFileUploadV1"
 	FileManagementService_ReportUploadProgressV1_FullMethodName = "/dist_file_storage.FileManagementService/ReportUploadProgressV1"
+	FileManagementService_CancelUploadV1_FullMethodName         = "/dist_file_storage.FileManagementService/CancelUploadV1"
 	FileManagementService_GetFileDownloadInfoV1_FullMethodName  = "/dist_file_storage.FileManagementService/GetFileDownloadInfoV1"
 )
 
@@ -31,6 +32,7 @@ const (
 type FileManagementServiceClient interface {
 	InitFileUploadV1(ctx context.Context, in *InitFileUploadV1Request, opts ...grpc.CallOption) (*InitFileUploadV1Response, error)
 	ReportUploadProgressV1(ctx context.Context, in *ReportUploadProgressV1Request, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CancelUploadV1(ctx context.Context, in *CancelUploadV1Request, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetFileDownloadInfoV1(ctx context.Context, in *GetFileDownloadInfoV1Request, opts ...grpc.CallOption) (*GetFileDownloadInfoV1Response, error)
 }
 
@@ -60,6 +62,15 @@ func (c *fileManagementServiceClient) ReportUploadProgressV1(ctx context.Context
 	return out, nil
 }
 
+func (c *fileManagementServiceClient) CancelUploadV1(ctx context.Context, in *CancelUploadV1Request, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, FileManagementService_CancelUploadV1_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *fileManagementServiceClient) GetFileDownloadInfoV1(ctx context.Context, in *GetFileDownloadInfoV1Request, opts ...grpc.CallOption) (*GetFileDownloadInfoV1Response, error) {
 	out := new(GetFileDownloadInfoV1Response)
 	err := c.cc.Invoke(ctx, FileManagementService_GetFileDownloadInfoV1_FullMethodName, in, out, opts...)
@@ -75,6 +86,7 @@ func (c *fileManagementServiceClient) GetFileDownloadInfoV1(ctx context.Context,
 type FileManagementServiceServer interface {
 	InitFileUploadV1(context.Context, *InitFileUploadV1Request) (*InitFileUploadV1Response, error)
 	ReportUploadProgressV1(context.Context, *ReportUploadProgressV1Request) (*emptypb.Empty, error)
+	CancelUploadV1(context.Context, *CancelUploadV1Request) (*emptypb.Empty, error)
 	GetFileDownloadInfoV1(context.Context, *GetFileDownloadInfoV1Request) (*GetFileDownloadInfoV1Response, error)
 }
 
@@ -87,6 +99,9 @@ func (UnimplementedFileManagementServiceServer) InitFileUploadV1(context.Context
 }
 func (UnimplementedFileManagementServiceServer) ReportUploadProgressV1(context.Context, *ReportUploadProgressV1Request) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReportUploadProgressV1 not implemented")
+}
+func (UnimplementedFileManagementServiceServer) CancelUploadV1(context.Context, *CancelUploadV1Request) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelUploadV1 not implemented")
 }
 func (UnimplementedFileManagementServiceServer) GetFileDownloadInfoV1(context.Context, *GetFileDownloadInfoV1Request) (*GetFileDownloadInfoV1Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFileDownloadInfoV1 not implemented")
@@ -139,6 +154,24 @@ func _FileManagementService_ReportUploadProgressV1_Handler(srv interface{}, ctx 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FileManagementService_CancelUploadV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelUploadV1Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileManagementServiceServer).CancelUploadV1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FileManagementService_CancelUploadV1_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileManagementServiceServer).CancelUploadV1(ctx, req.(*CancelUploadV1Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _FileManagementService_GetFileDownloadInfoV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetFileDownloadInfoV1Request)
 	if err := dec(in); err != nil {
@@ -171,6 +204,10 @@ var FileManagementService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReportUploadProgressV1",
 			Handler:    _FileManagementService_ReportUploadProgressV1_Handler,
+		},
+		{
+			MethodName: "CancelUploadV1",
+			Handler:    _FileManagementService_CancelUploadV1_Handler,
 		},
 		{
 			MethodName: "GetFileDownloadInfoV1",

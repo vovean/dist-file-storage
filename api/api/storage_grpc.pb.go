@@ -20,9 +20,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	StorageService_StoreV1_FullMethodName = "/dist_file_storage.StorageService/StoreV1"
-	StorageService_ServeV1_FullMethodName = "/dist_file_storage.StorageService/ServeV1"
-	StorageService_InfoV1_FullMethodName  = "/dist_file_storage.StorageService/InfoV1"
+	StorageService_StoreV1_FullMethodName  = "/dist_file_storage.StorageService/StoreV1"
+	StorageService_ServeV1_FullMethodName  = "/dist_file_storage.StorageService/ServeV1"
+	StorageService_InfoV1_FullMethodName   = "/dist_file_storage.StorageService/InfoV1"
+	StorageService_DeleteV1_FullMethodName = "/dist_file_storage.StorageService/DeleteV1"
 )
 
 // StorageServiceClient is the client API for StorageService service.
@@ -32,6 +33,7 @@ type StorageServiceClient interface {
 	StoreV1(ctx context.Context, opts ...grpc.CallOption) (StorageService_StoreV1Client, error)
 	ServeV1(ctx context.Context, in *ServeV1Request, opts ...grpc.CallOption) (StorageService_ServeV1Client, error)
 	InfoV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*InfoV1Response, error)
+	DeleteV1(ctx context.Context, in *DeleteV1Request, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type storageServiceClient struct {
@@ -117,6 +119,15 @@ func (c *storageServiceClient) InfoV1(ctx context.Context, in *emptypb.Empty, op
 	return out, nil
 }
 
+func (c *storageServiceClient) DeleteV1(ctx context.Context, in *DeleteV1Request, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, StorageService_DeleteV1_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StorageServiceServer is the server API for StorageService service.
 // All implementations should embed UnimplementedStorageServiceServer
 // for forward compatibility
@@ -124,6 +135,7 @@ type StorageServiceServer interface {
 	StoreV1(StorageService_StoreV1Server) error
 	ServeV1(*ServeV1Request, StorageService_ServeV1Server) error
 	InfoV1(context.Context, *emptypb.Empty) (*InfoV1Response, error)
+	DeleteV1(context.Context, *DeleteV1Request) (*emptypb.Empty, error)
 }
 
 // UnimplementedStorageServiceServer should be embedded to have forward compatible implementations.
@@ -138,6 +150,9 @@ func (UnimplementedStorageServiceServer) ServeV1(*ServeV1Request, StorageService
 }
 func (UnimplementedStorageServiceServer) InfoV1(context.Context, *emptypb.Empty) (*InfoV1Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InfoV1 not implemented")
+}
+func (UnimplementedStorageServiceServer) DeleteV1(context.Context, *DeleteV1Request) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteV1 not implemented")
 }
 
 // UnsafeStorageServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -216,6 +231,24 @@ func _StorageService_InfoV1_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StorageService_DeleteV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteV1Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StorageServiceServer).DeleteV1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StorageService_DeleteV1_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StorageServiceServer).DeleteV1(ctx, req.(*DeleteV1Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StorageService_ServiceDesc is the grpc.ServiceDesc for StorageService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -226,6 +259,10 @@ var StorageService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InfoV1",
 			Handler:    _StorageService_InfoV1_Handler,
+		},
+		{
+			MethodName: "DeleteV1",
+			Handler:    _StorageService_DeleteV1_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

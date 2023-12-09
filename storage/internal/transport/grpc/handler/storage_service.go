@@ -83,7 +83,7 @@ func (s *StorageService) ServeV1(req *api.ServeV1Request, stream api.StorageServ
 		},
 	)
 
-	if err := streamWriter.SendData(filePart); err != nil {
+	if _, err := streamWriter.SendData(filePart); err != nil {
 		log.Printf("error writing file to stream: %v\n", err)
 		return status.Error(codes.Internal, "internal error")
 	}
@@ -96,10 +96,20 @@ func (s *StorageService) ServeV1(req *api.ServeV1Request, stream api.StorageServ
 	return nil
 }
 
-func (s *StorageService) InfoV1(ctx context.Context, empty *emptypb.Empty) (*api.InfoV1Response, error) {
+func (s *StorageService) InfoV1(ctx context.Context, _ *emptypb.Empty) (*api.InfoV1Response, error) {
 	info, err := s.s.Info(ctx)
 	if err != nil {
+		log.Printf("error getting storage info: %v\n", err)
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 	return &api.InfoV1Response{Size: info.Size}, nil
+}
+
+func (s *StorageService) DeleteV1(ctx context.Context, req *api.DeleteV1Request) (*emptypb.Empty, error) {
+	if err := s.s.Delete(req.GetPath()); err != nil {
+		log.Printf("error deleting file: %v\n", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &emptypb.Empty{}, nil
 }

@@ -51,12 +51,12 @@ func Run() {
 		defer wg.Done()
 
 		if err := server.Run(ctx); err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 	}()
 
 	c := make(chan os.Signal, 1) // we need to reserve to buffer size 1, so the notifier are not blocked
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGINT)
 
 	<-c
 	cancel()

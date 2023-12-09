@@ -81,7 +81,7 @@ func WriteFileFromReader(filePath string, r io.Reader) (err error) {
 
 	file, err := os.Create(filePath)
 	if err != nil {
-		return errors.Wrap(err, "create file")
+		return errors.Wrapf(err, "create file %s", filePath)
 	}
 	defer func() {
 		if errC := file.Close(); errC != nil {
@@ -100,7 +100,7 @@ func (s *Service) Store(ctx context.Context, req domain.StoreFileRequest) error 
 		reader: req.Content,
 	}
 
-	return WriteFileFromReader(req.Path, r)
+	return WriteFileFromReader(path.Join(s.root, req.Path), r)
 }
 
 func (s *Service) Serve(ctx context.Context, req domain.ServeFileRequest) (io.ReadCloser, error) {
@@ -116,4 +116,13 @@ func (s *Service) Serve(ctx context.Context, req domain.ServeFileRequest) (io.Re
 
 func (s *Service) Info(ctx context.Context) (domain.StorageInfo, error) {
 	return domain.StorageInfo{Size: s.sizeBytes}, nil
+}
+
+func (s *Service) Delete(filepath string) error {
+	err := os.Remove(path.Join(s.root, filepath))
+	if err != nil && !os.IsNotExist(err) {
+		// Возвращаем ошибку, только если это не ошибка "файл не найден"
+		return err
+	}
+	return nil
 }

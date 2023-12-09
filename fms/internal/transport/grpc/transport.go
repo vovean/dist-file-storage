@@ -3,11 +3,11 @@ package grpc
 import (
 	"api/api"
 	"context"
+	"fms/internal"
+	"fms/internal/transport/grpc/handler"
 	"fmt"
 	"log"
 	"net"
-	"storage/internal"
-	"storage/internal/transport/grpc/handler"
 	"time"
 
 	"github.com/pkg/errors"
@@ -22,13 +22,13 @@ type Transport struct {
 	c      Config
 }
 
-func NewTransport(s internal.Service, c Config) *Transport {
+func NewTransport(s internal.FileManagementService, c Config) *Transport {
 	server := grpc.NewServer()
 
 	reflection.Register(server)
 
-	storageServiceHandler := handler.NewStorageService(s, handler.StorageServiceConfig{ServeBatchSizeBytes: c.ServeBatchSizeBytes})
-	api.RegisterStorageServiceServer(server, storageServiceHandler)
+	fmsHandler := handler.NewFileManagementService(s)
+	api.RegisterFileManagementServiceServer(server, fmsHandler)
 
 	return &Transport{server: server, c: c}
 }

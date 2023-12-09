@@ -12,6 +12,8 @@ service FileManagementService {
 
   rpc ReportUploadProgressV1 (ReportUploadProgressV1Request) returns (google.protobuf.Empty);
 
+  rpc CancelUploadV1 (CancelUploadV1Request) returns (google.protobuf.Empty);
+
   rpc GetFileDownloadInfoV1 (GetFileDownloadInfoV1Request) returns (GetFileDownloadInfoV1Response);
 }
 
@@ -44,4 +46,8 @@ message GetFileDownloadInfoV1Request {
 
 message GetFileDownloadInfoV1Response {
   repeated FilePart fileParts = 2;
+}
+
+message CancelUploadV1Request {
+  string filename = 1;
 }
