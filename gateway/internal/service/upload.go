@@ -60,11 +60,21 @@ func (s *Service) Upload(ctx context.Context, req domain.UploadFileRequest, r io
 			return errors.Wrapf(err, "send file part (%d) to storage", p.PartId)
 		}
 
+		// Закрываем stream с хранилищем
 		if _, err := stream.CloseAndRecv(); err != nil {
 			err = goerrors.Join(err, s.cancelUpload(ctx, req.Filename))
 			return errors.Wrapf(err, "error closing stream for storage %s", p.Storage)
 		}
 		closed = true
+
+		// Сообщаем FMS, что загрузили часть файла
+		uploadProgress := &api.ReportUploadProgressV1Request{
+			Filename: req.Filename,
+			PartId:   int32(p.PartId),
+		}
+		if _, err := s.fms.ReportUploadProgressV1(ctx, uploadProgress); err != nil {
+			return errors.Wrapf(err, "report upload progress for part %d", p.PartId)
+		}
 	}
 
 	return nil

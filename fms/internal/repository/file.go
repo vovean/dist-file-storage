@@ -64,6 +64,9 @@ func (r *FMSRepository) GetFileParts(ctx context.Context, filename string) ([]do
 	if err := rows.Err(); err != nil {
 		return nil, errors.Wrap(err, "rows err")
 	}
+	if len(res) == 0 {
+		return nil, domain.ErrFileNotFound
+	}
 
 	return res, nil
 }

@@ -11,11 +11,16 @@ import (
 
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (s *Service) Download(ctx context.Context, req domain.DownloadFileRequest) (domain.DownloadedFile, error) {
 	downloadPlan, err := s.fms.GetFileDownloadInfoV1(ctx, &api.GetFileDownloadInfoV1Request{Filename: req.Filename})
 	if err != nil {
+		if status.Code(err) == codes.NotFound {
+			return domain.DownloadedFile{}, domain.ErrFileNotFound
+		}
 		return domain.DownloadedFile{}, errors.Wrap(err, "initialize download")
 	}
 
@@ -32,11 +37,10 @@ func (s *Service) Download(ctx context.Context, req domain.DownloadFileRequest) 
 		return fileParts[i].PartId < fileParts[j].PartId
 	})
 
-	eg, ctx := errgroup.WithContext(ctx)
-
 	var (
 		partDataReaders = make(map[int]io.Reader, len(fileParts))
 		mu              sync.Mutex
+		eg              errgroup.Group
 	)
 	for _, fp := range fileParts {
 		fp := fp
@@ -71,12 +75,13 @@ func (s *Service) Download(ctx context.Context, req domain.DownloadFileRequest) 
 
 	inOrderReaders := make([]io.Reader, 0, len(fileParts))
 	for _, fp := range fileParts {
-		inOrderReaders[fp.PartId] = partDataReaders[fp.PartId]
+		inOrderReaders = append(inOrderReaders, partDataReaders[fp.PartId])
 	}
 	fileReader := io.MultiReader(inOrderReaders...)
 
 	return domain.DownloadedFile{
-		Size:    domain.FileParts(fileParts).TotalSize(),
-		Content: fileReader,
+		Size:     domain.FileParts(fileParts).TotalSize(),
+		Filename: req.Filename,
+		Content:  fileReader,
 	}, nil
 }

@@ -3,6 +3,7 @@ package handler
 import (
 	"api/api"
 	"context"
+	"errors"
 	"fms/internal"
 	"fms/internal/domain"
 	"log"
@@ -60,6 +61,9 @@ func (fms *FileManagementService) GetFileDownloadInfoV1(ctx context.Context, req
 	parts, err := fms.s.GetFileDownloadInfo(ctx, req.GetFilename())
 	if err != nil {
 		log.Printf("cannot get file info: %v", err)
+		if errors.Is(err, domain.ErrFileNotFound) {
+			return nil, status.Error(codes.NotFound, "file not found")
+		}
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 

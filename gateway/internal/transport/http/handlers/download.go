@@ -49,6 +49,4 @@ func (h httpHandler) Download(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, ErrInternalError.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
