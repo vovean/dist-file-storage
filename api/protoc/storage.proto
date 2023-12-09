@@ -10,7 +10,9 @@ option go_package = ".;api";
 service StorageService {
   rpc StoreV1 (stream StoreV1Request) returns (google.protobuf.Empty);
 
-  rpc DownloadV1 (DownloadV1Request) returns (stream DownloadV1Response);
+  rpc ServeV1 (ServeV1Request) returns (stream ServeV1Response);
+
+  rpc InfoV1 (google.protobuf.Empty) returns (InfoV1Response);
 }
 
 message StoreRequestMetadata {
@@ -24,10 +26,14 @@ message StoreV1Request {
   }
 }
 
-message DownloadV1Request {
+message ServeV1Request {
   string path = 1;
 }
 
-message DownloadV1Response {
+message ServeV1Response {
   bytes data = 1;
+}
+
+message InfoV1Response {
+  uint64 size = 1;
 }

@@ -3,13 +3,12 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
-	"gateway/config"
-	"gateway/internal/service"
-	"gateway/internal/transport/http"
 	"log"
 	"os"
 	"os/signal"
+	"storage/config"
+	"storage/internal/service"
+	"storage/internal/transport/grpc"
 	"sync"
 	"syscall"
 
@@ -20,7 +19,7 @@ func main() {
 	Run()
 }
 
-const defaultConfigPath = "config/gateway.yml"
+const defaultConfigPath = "config/storage.yml"
 
 func Run() {
 	configPath := flag.String("config", defaultConfigPath, "path to yaml config")
@@ -31,26 +30,16 @@ func Run() {
 		log.Fatal(err)
 	}
 
-	serviceConfig := service.Config{
-		FMSAddr:           fmt.Sprintf("%s:%d", cfg.FMS.Host, cfg.FMS.Port),
-		UploadBatchSize:   cfg.Uploader.ChunkSize.Bytes,
-		DownloadBatchSize: cfg.Downloader.ChunkSize.Bytes,
-	}
-	s, err := service.New(context.Background(), serviceConfig)
+	svc, err := service.New(cfg.Storage.Root, cfg.Storage.Size.Bytes)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	serverConfig := http.Config{
-		Port: cfg.Server.Port,
-		DownloadEndpoint: http.DownloadEndpointConfig{
-			DownloadTimeout: cfg.Downloader.DownloadTimeout,
-		},
-		UploadEndpoint: http.UploadEndpointConfig{
-			UploadTimeout: cfg.Uploader.UploadTimeout,
-		},
+	grpcConfig := grpc.Config{
+		Port:                cfg.Server.Port,
+		ServeBatchSizeBytes: cfg.API.ServeChunkSize.Bytes,
 	}
-	server := http.NewTransport(s, serverConfig)
+	server := grpc.NewTransport(svc, grpcConfig)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

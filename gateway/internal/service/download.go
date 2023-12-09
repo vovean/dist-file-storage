@@ -3,8 +3,9 @@ package service
 import (
 	"api/api"
 	"context"
-	"dist-file-storage/internal/domain"
+	"gateway/internal/domain"
 	"io"
+	"pkg/grpc_stream"
 	"sort"
 	"sync"
 
@@ -45,12 +46,17 @@ func (s *Service) Download(ctx context.Context, req domain.DownloadFileRequest) 
 				return errors.Wrapf(err, "get or add storage %s", fp.Storage)
 			}
 
-			stream, err := storage.DownloadV1(ctx, &api.DownloadV1Request{Path: fp.Path})
+			stream, err := storage.ServeV1(ctx, &api.ServeV1Request{Path: fp.Path})
 			if err != nil {
 				return errors.Wrapf(err, "open download stream %s", fp.Storage)
 			}
 
-			streamReader := NewGrpcStreamReader(stream)
+			streamReader := grpc_stream.NewGrpcStreamReader[api.ServeV1Response](
+				stream,
+				func(t *api.ServeV1Response) ([]byte, error) {
+					return t.GetData(), nil
+				},
+			)
 
 			mu.Lock()
 			partDataReaders[fp.PartId] = streamReader

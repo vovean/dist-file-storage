@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"context"
-	"dist-file-storage/internal/domain"
 	"errors"
 	"fmt"
+	"gateway/internal/domain"
 	"io"
 	"log"
 	"net/http"

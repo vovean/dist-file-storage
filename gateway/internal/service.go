@@ -2,7 +2,7 @@ package internal
 
 import (
 	"context"
-	"dist-file-storage/internal/domain"
+	"gateway/internal/domain"
 	"io"
 )
 

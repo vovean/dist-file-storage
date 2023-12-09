@@ -3,8 +3,8 @@ package service
 import (
 	"api/api"
 	"context"
-	"dist-file-storage/internal/domain"
 	"fmt"
+	"gateway/internal/domain"
 	"io"
 	"log"
 	"sort"

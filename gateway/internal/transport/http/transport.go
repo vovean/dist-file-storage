@@ -2,9 +2,9 @@ package http
 
 import (
 	"context"
-	"dist-file-storage/internal"
-	"dist-file-storage/internal/transport/http/handlers"
 	"fmt"
+	"gateway/internal"
+	"gateway/internal/transport/http/handlers"
 	"log"
 	"net/http"
 	"time"
@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const serverShutdownTimeout = 30 * time.Second
+const serverShutdownTimeout = 30 * time.Second //todo в конфиг
 
 type Transport struct {
 	server *http.Server

@@ -1,4 +1,4 @@
-module dist-file-storage
+module gateway
 
 go 1.21
 

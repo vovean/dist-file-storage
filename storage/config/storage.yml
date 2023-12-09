@@ -1,0 +1,7 @@
+server:
+  port: 8082
+storage:
+  root: /tmp/storage1
+  size: 1GB
+api:
+  serve_chunk_size: 10KB

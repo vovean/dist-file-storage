@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"dist-file-storage/internal"
+	"gateway/internal"
 	"net/http"
 
 	"github.com/gorilla/mux"

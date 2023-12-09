@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
-	"dist-file-storage/internal/domain"
 	"errors"
+	"gateway/internal/domain"
 	"log"
 	"net/http"
 )

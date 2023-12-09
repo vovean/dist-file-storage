@@ -20,8 +20,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	StorageService_StoreV1_FullMethodName    = "/dist_file_storage.StorageService/StoreV1"
-	StorageService_DownloadV1_FullMethodName = "/dist_file_storage.StorageService/DownloadV1"
+	StorageService_StoreV1_FullMethodName = "/dist_file_storage.StorageService/StoreV1"
+	StorageService_ServeV1_FullMethodName = "/dist_file_storage.StorageService/ServeV1"
+	StorageService_InfoV1_FullMethodName  = "/dist_file_storage.StorageService/InfoV1"
 )
 
 // StorageServiceClient is the client API for StorageService service.
@@ -29,7 +30,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StorageServiceClient interface {
 	StoreV1(ctx context.Context, opts ...grpc.CallOption) (StorageService_StoreV1Client, error)
-	DownloadV1(ctx context.Context, in *DownloadV1Request, opts ...grpc.CallOption) (StorageService_DownloadV1Client, error)
+	ServeV1(ctx context.Context, in *ServeV1Request, opts ...grpc.CallOption) (StorageService_ServeV1Client, error)
+	InfoV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*InfoV1Response, error)
 }
 
 type storageServiceClient struct {
@@ -74,12 +76,12 @@ func (x *storageServiceStoreV1Client) CloseAndRecv() (*emptypb.Empty, error) {
 	return m, nil
 }
 
-func (c *storageServiceClient) DownloadV1(ctx context.Context, in *DownloadV1Request, opts ...grpc.CallOption) (StorageService_DownloadV1Client, error) {
-	stream, err := c.cc.NewStream(ctx, &StorageService_ServiceDesc.Streams[1], StorageService_DownloadV1_FullMethodName, opts...)
+func (c *storageServiceClient) ServeV1(ctx context.Context, in *ServeV1Request, opts ...grpc.CallOption) (StorageService_ServeV1Client, error) {
+	stream, err := c.cc.NewStream(ctx, &StorageService_ServiceDesc.Streams[1], StorageService_ServeV1_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &storageServiceDownloadV1Client{stream}
+	x := &storageServiceServeV1Client{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -89,21 +91,30 @@ func (c *storageServiceClient) DownloadV1(ctx context.Context, in *DownloadV1Req
 	return x, nil
 }
 
-type StorageService_DownloadV1Client interface {
-	Recv() (*DownloadV1Response, error)
+type StorageService_ServeV1Client interface {
+	Recv() (*ServeV1Response, error)
 	grpc.ClientStream
 }
 
-type storageServiceDownloadV1Client struct {
+type storageServiceServeV1Client struct {
 	grpc.ClientStream
 }
 
-func (x *storageServiceDownloadV1Client) Recv() (*DownloadV1Response, error) {
-	m := new(DownloadV1Response)
+func (x *storageServiceServeV1Client) Recv() (*ServeV1Response, error) {
+	m := new(ServeV1Response)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
+}
+
+func (c *storageServiceClient) InfoV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*InfoV1Response, error) {
+	out := new(InfoV1Response)
+	err := c.cc.Invoke(ctx, StorageService_InfoV1_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 // StorageServiceServer is the server API for StorageService service.
@@ -111,7 +122,8 @@ func (x *storageServiceDownloadV1Client) Recv() (*DownloadV1Response, error) {
 // for forward compatibility
 type StorageServiceServer interface {
 	StoreV1(StorageService_StoreV1Server) error
-	DownloadV1(*DownloadV1Request, StorageService_DownloadV1Server) error
+	ServeV1(*ServeV1Request, StorageService_ServeV1Server) error
+	InfoV1(context.Context, *emptypb.Empty) (*InfoV1Response, error)
 }
 
 // UnimplementedStorageServiceServer should be embedded to have forward compatible implementations.
@@ -121,8 +133,11 @@ type UnimplementedStorageServiceServer struct {
 func (UnimplementedStorageServiceServer) StoreV1(StorageService_StoreV1Server) error {
 	return status.Errorf(codes.Unimplemented, "method StoreV1 not implemented")
 }
-func (UnimplementedStorageServiceServer) DownloadV1(*DownloadV1Request, StorageService_DownloadV1Server) error {
-	return status.Errorf(codes.Unimplemented, "method DownloadV1 not implemented")
+func (UnimplementedStorageServiceServer) ServeV1(*ServeV1Request, StorageService_ServeV1Server) error {
+	return status.Errorf(codes.Unimplemented, "method ServeV1 not implemented")
+}
+func (UnimplementedStorageServiceServer) InfoV1(context.Context, *emptypb.Empty) (*InfoV1Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InfoV1 not implemented")
 }
 
 // UnsafeStorageServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -162,25 +177,43 @@ func (x *storageServiceStoreV1Server) Recv() (*StoreV1Request, error) {
 	return m, nil
 }
 
-func _StorageService_DownloadV1_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(DownloadV1Request)
+func _StorageService_ServeV1_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ServeV1Request)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(StorageServiceServer).DownloadV1(m, &storageServiceDownloadV1Server{stream})
+	return srv.(StorageServiceServer).ServeV1(m, &storageServiceServeV1Server{stream})
 }
 
-type StorageService_DownloadV1Server interface {
-	Send(*DownloadV1Response) error
+type StorageService_ServeV1Server interface {
+	Send(*ServeV1Response) error
 	grpc.ServerStream
 }
 
-type storageServiceDownloadV1Server struct {
+type storageServiceServeV1Server struct {
 	grpc.ServerStream
 }
 
-func (x *storageServiceDownloadV1Server) Send(m *DownloadV1Response) error {
+func (x *storageServiceServeV1Server) Send(m *ServeV1Response) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func _StorageService_InfoV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StorageServiceServer).InfoV1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StorageService_InfoV1_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StorageServiceServer).InfoV1(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 // StorageService_ServiceDesc is the grpc.ServiceDesc for StorageService service.
@@ -189,7 +222,12 @@ func (x *storageServiceDownloadV1Server) Send(m *DownloadV1Response) error {
 var StorageService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "dist_file_storage.StorageService",
 	HandlerType: (*StorageServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "InfoV1",
+			Handler:    _StorageService_InfoV1_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "StoreV1",
@@ -197,8 +235,8 @@ var StorageService_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 		{
-			StreamName:    "DownloadV1",
-			Handler:       _StorageService_DownloadV1_Handler,
+			StreamName:    "ServeV1",
+			Handler:       _StorageService_ServeV1_Handler,
 			ServerStreams: true,
 		},
 	},
