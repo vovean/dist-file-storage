@@ -12,7 +12,7 @@ import (
 const connTimeout = 1 * time.Second
 
 func NewConnection(ctx context.Context, addr string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithTimeout(ctx, connTimeout)
 	defer cancel()
 
 	opts = append(opts,

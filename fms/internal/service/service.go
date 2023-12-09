@@ -92,7 +92,7 @@ func (m *FileManagement) CancelUpload(ctx context.Context, filename string) erro
 
 		if _, err := storageClient.DeleteV1(ctx, &api.DeleteV1Request{Path: p.Path}); err != nil {
 			log.Printf("cannot delete from storage %s by path %s\n", p.Storage.Address, p.Path)
-			return errors.Wrapf(err, "delete from storage %s by path %s\n", p.Storage.Address, p.Path)
+			return errors.Wrapf(err, "delete from storage %s by path %s", p.Storage.Address, p.Path)
 		}
 	}
 

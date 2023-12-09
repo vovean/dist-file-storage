@@ -11,9 +11,8 @@ import (
 
 func TestSizedReader_Read(t *testing.T) {
 	type readerParams struct {
-		size        uint64
-		alreadyRead uint64
-		r           io.Reader
+		size uint64
+		r    io.Reader
 	}
 	tests := []struct {
 		name         string
@@ -136,7 +135,7 @@ func TestReaderPartitioner_NextPart(t *testing.T) {
 
 				parts = append(parts, partData)
 			}
-			require.Equal(t, len(tt.wantParts), partsCount)
+			require.Len(t, partsCount, len(tt.wantParts))
 			require.Equal(t, tt.wantParts, parts)
 		})
 	}

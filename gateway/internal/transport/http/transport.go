@@ -12,7 +12,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-const serverShutdownTimeout = 30 * time.Second //todo в конфиг
+const serverShutdownTimeout = 30 * time.Second // todo в конфиг
+const readHeaderTimeout = 1 * time.Second      // todo в конфиг
 
 type Transport struct {
 	server *http.Server
@@ -30,8 +31,9 @@ func NewTransport(s internal.Service, c Config) *Transport {
 
 	return &Transport{
 		server: &http.Server{
-			Addr:    fmt.Sprintf(":%d", c.Port),
-			Handler: mux,
+			Addr:              fmt.Sprintf(":%d", c.Port),
+			ReadHeaderTimeout: readHeaderTimeout,
+			Handler:           mux,
 		},
 	}
 }

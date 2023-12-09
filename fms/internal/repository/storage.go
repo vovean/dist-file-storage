@@ -13,6 +13,7 @@ func (r *FMSRepository) GetStorages(ctx context.Context) ([]domain.Storage, erro
 	if err != nil {
 		return nil, errors.Wrap(err, "query db")
 	}
+	defer rows.Close()
 
 	var res []domain.Storage
 	for rows.Next() {

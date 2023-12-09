@@ -34,10 +34,10 @@ func FolderExists(path string) (bool, error) {
 }
 
 // CanWriteToFolder проверяет доступ на запись в папку
-func CanWriteToFolder(path string) (bool, error) {
+func CanWriteToFolder(path string) bool {
 	tmpfile, err := os.CreateTemp(path, "test")
 	if err != nil {
-		return false, nil
+		return false
 	}
 
 	// Удаляем временный файл после создания
@@ -48,7 +48,7 @@ func CanWriteToFolder(path string) (bool, error) {
 		log.Printf("cannot remove temp file: %v\n", err)
 	}
 
-	return true, nil
+	return true
 }
 
 func New(root string, sizeBytes uint64) (*Service, error) {
@@ -60,10 +60,7 @@ func New(root string, sizeBytes uint64) (*Service, error) {
 		return nil, fmt.Errorf("provided root folder %s doesn't exist", root)
 	}
 
-	canWrite, err := CanWriteToFolder(root)
-	if err != nil {
-		return nil, errors.Wrapf(err, "cannot check fodler %s for being writeable", root)
-	}
+	canWrite := CanWriteToFolder(root)
 	if !canWrite {
 		return nil, errors.New("provided storage root is not writeable")
 	}

@@ -9,7 +9,7 @@ import (
 
 type UUIDPath struct{}
 
-func (u UUIDPath) MakePath(file domain.FullFileInfo, part domain.FilePart) string {
+func (u UUIDPath) MakePath(_ domain.FullFileInfo, _ domain.FilePart) string {
 	s := uuid.NewString()
 	return strings.ReplaceAll(s, "-", "/")
 }

@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-const serverShutdownTimeout = 30 * time.Second //todo в конфиг
+const serverShutdownTimeout = 30 * time.Second // todo в конфиг
 
 type Transport struct {
 	server *grpc.Server
