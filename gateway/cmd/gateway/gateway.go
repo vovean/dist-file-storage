@@ -44,10 +44,10 @@ func Run() {
 	serverConfig := http.Config{
 		Port: cfg.Server.Port,
 		DownloadEndpoint: http.DownloadEndpointConfig{
-			DownloadTimeout: cfg.Downloader.DownloadTimeout,
+			DownloadTimeout: cfg.Downloader.Timeout,
 		},
 		UploadEndpoint: http.UploadEndpointConfig{
-			UploadTimeout: cfg.Uploader.UploadTimeout,
+			UploadTimeout: cfg.Uploader.Timeout,
 		},
 	}
 	server := http.NewTransport(s, serverConfig)

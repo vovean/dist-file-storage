@@ -3,11 +3,11 @@ server:
 
 uploader:
   chunk_size_bytes: 10kb
-  upload_timeout: 10m
+  timeout: 10m
 
 downloader:
   chunk_size_bytes: 10kb
-  download_timeout: 10m
+  timeout: 10m
 
 fms:
   host: localhost

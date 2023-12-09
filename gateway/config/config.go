@@ -7,21 +7,21 @@ import (
 
 type Config struct {
 	Server struct {
-		Port int `yaml:"port"`
+		Port int `yaml:"port" env:"SERVER_PORT"`
 	} `yaml:"server"`
 
 	Uploader struct {
-		ChunkSize     config.DataSize `yaml:"chunk_size_bytes"`
-		UploadTimeout time.Duration   `yaml:"upload_timeout"`
+		ChunkSize config.DataSize `yaml:"chunk_size_bytes" env:"UPLOADER_CHUNKSIZE"`
+		Timeout   time.Duration   `yaml:"timeout" env:"UPLOADER_TIMEOUT"`
 	} `yaml:"uploader"`
 
 	Downloader struct {
-		ChunkSize       config.DataSize `yaml:"chunk_size_bytes"`
-		DownloadTimeout time.Duration   `yaml:"download_timeout"`
+		ChunkSize config.DataSize `yaml:"chunk_size_bytes" env:"DOWNLOADER_CHUNKSIZE"`
+		Timeout   time.Duration   `yaml:"timeout" env:"DOWNLOADER_TIMEOUT"`
 	} `yaml:"downloader"`
 
 	FMS struct {
-		Host string `yaml:"host"`
-		Port uint   `yaml:"port"`
+		Host string `yaml:"host" env:"FMS_HOST"`
+		Port uint   `yaml:"port" env:"FMS_PORT"`
 	} `yaml:"fms"`
 }
