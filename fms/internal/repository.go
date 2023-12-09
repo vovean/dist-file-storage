@@ -8,16 +8,13 @@ import (
 )
 
 type FileRepository interface {
-	AddFile(ctx context.Context, file domain.FullFileInfo, parts []domain.FilePart) error
 	AddFileTx(ctx context.Context, tx *sqlx.Tx, file domain.FullFileInfo, parts []domain.FilePart) error
 	GetFileParts(ctx context.Context, filename string) ([]domain.FilePart, error)
-	DeleteFile(ctx context.Context, filename string) error
 	DeleteFileTx(ctx context.Context, tx *sqlx.Tx, filename string) error
 	MarkPartStored(ctx context.Context, filename string, partId int) error
 }
 
 type StorageRepository interface {
-	GetStorages(ctx context.Context) ([]domain.Storage, error)
 	GetStoragesTx(ctx context.Context, tx *sqlx.Tx) ([]domain.Storage, error)
 	AddStorage(ctx context.Context, storage domain.Storage) (domain.Storage, error)
 }

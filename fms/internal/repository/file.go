@@ -9,11 +9,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r *FMSRepository) AddFile(ctx context.Context, file domain.FullFileInfo, parts []domain.FilePart) error {
-	//tx, err := r.db.BeginTx(ctx, nil)
-	return nil
-}
-
 func (r *FMSRepository) AddFileTx(ctx context.Context, tx *sqlx.Tx, file domain.FullFileInfo, parts []domain.FilePart) error {
 	var fileId int64
 	err := tx.QueryRowContext(ctx, insertFileQuery, file.Filename, file.Size).Scan(&fileId)
@@ -69,11 +64,6 @@ func (r *FMSRepository) GetFileParts(ctx context.Context, filename string) ([]do
 	}
 
 	return res, nil
-}
-
-func (r *FMSRepository) DeleteFile(ctx context.Context, filename string) error {
-	//TODO implement me
-	panic("implement me")
 }
 
 func (r *FMSRepository) DeleteFileTx(ctx context.Context, tx *sqlx.Tx, filename string) error {
