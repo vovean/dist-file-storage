@@ -97,7 +97,7 @@ fms (File Management Service) и 7 хранилищ.
 ### Успешная загрузка файлов
 
 <details>
-  <summary>Успешная загрузка файла</summary>
+  <summary>Успешная загрузка файла (тыкните на тогл-треугольничек, чтоб развернуть картинку)</summary>
 
 ![](docs/images/successful-upload.png)
 </details>
@@ -117,7 +117,7 @@ fms (File Management Service) и 7 хранилищ.
 ### Загрузка файл с ошибкой
 
 <details>
-  <summary>Загрузка файл с ошибкой</summary>
+  <summary>Загрузка файл с ошибкой (тыкните на тогл-треугольничек, чтоб развернуть картинку)</summary>
 
 ![](docs/images/upload-error.png)
 </details>
@@ -139,7 +139,7 @@ fms (File Management Service) и 7 хранилищ.
 ### Скачивание файла
 
 <details>
-  <summary>Скачивание файла</summary>
+  <summary>Скачивание файла (тыкните на тогл-треугольничек, чтоб развернуть картинку)</summary>
 
 ![](docs/images/download.png)
 </details>
