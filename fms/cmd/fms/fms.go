@@ -67,7 +67,11 @@ func Run() {
 	grpcConfig := grpc.Config{
 		Port: cfg.Server.Port,
 	}
-	server := grpc.NewTransport(svc, grpcConfig)
+	server := grpc.NewTransport(
+		svc,
+		svc,
+		grpcConfig,
+	)
 
 	// Запускаем
 	ctx, cancel := context.WithCancel(context.Background())

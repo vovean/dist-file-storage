@@ -217,3 +217,91 @@ var FileManagementService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "protoc/fms.proto",
 }
+
+const (
+	FileManagementAdminService_AddStorageV1_FullMethodName = "/dist_file_storage.FileManagementAdminService/AddStorageV1"
+)
+
+// FileManagementAdminServiceClient is the client API for FileManagementAdminService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type FileManagementAdminServiceClient interface {
+	AddStorageV1(ctx context.Context, in *AddStorageV1Request, opts ...grpc.CallOption) (*AddStorageV1Response, error)
+}
+
+type fileManagementAdminServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewFileManagementAdminServiceClient(cc grpc.ClientConnInterface) FileManagementAdminServiceClient {
+	return &fileManagementAdminServiceClient{cc}
+}
+
+func (c *fileManagementAdminServiceClient) AddStorageV1(ctx context.Context, in *AddStorageV1Request, opts ...grpc.CallOption) (*AddStorageV1Response, error) {
+	out := new(AddStorageV1Response)
+	err := c.cc.Invoke(ctx, FileManagementAdminService_AddStorageV1_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// FileManagementAdminServiceServer is the server API for FileManagementAdminService service.
+// All implementations should embed UnimplementedFileManagementAdminServiceServer
+// for forward compatibility
+type FileManagementAdminServiceServer interface {
+	AddStorageV1(context.Context, *AddStorageV1Request) (*AddStorageV1Response, error)
+}
+
+// UnimplementedFileManagementAdminServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedFileManagementAdminServiceServer struct {
+}
+
+func (UnimplementedFileManagementAdminServiceServer) AddStorageV1(context.Context, *AddStorageV1Request) (*AddStorageV1Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddStorageV1 not implemented")
+}
+
+// UnsafeFileManagementAdminServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to FileManagementAdminServiceServer will
+// result in compilation errors.
+type UnsafeFileManagementAdminServiceServer interface {
+	mustEmbedUnimplementedFileManagementAdminServiceServer()
+}
+
+func RegisterFileManagementAdminServiceServer(s grpc.ServiceRegistrar, srv FileManagementAdminServiceServer) {
+	s.RegisterService(&FileManagementAdminService_ServiceDesc, srv)
+}
+
+func _FileManagementAdminService_AddStorageV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddStorageV1Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileManagementAdminServiceServer).AddStorageV1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FileManagementAdminService_AddStorageV1_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileManagementAdminServiceServer).AddStorageV1(ctx, req.(*AddStorageV1Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// FileManagementAdminService_ServiceDesc is the grpc.ServiceDesc for FileManagementAdminService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var FileManagementAdminService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "dist_file_storage.FileManagementAdminService",
+	HandlerType: (*FileManagementAdminServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AddStorageV1",
+			Handler:    _FileManagementAdminService_AddStorageV1_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "protoc/fms.proto",
+}

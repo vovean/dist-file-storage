@@ -11,3 +11,7 @@ type FileManagementService interface {
 	CancelUpload(ctx context.Context, filename string) error
 	GetFileDownloadInfo(ctx context.Context, filename string) ([]domain.FilePart, error)
 }
+
+type FileManagementAdminService interface {
+	AddStorage(ctx context.Context, storage domain.Storage) (domain.Storage, error)
+}

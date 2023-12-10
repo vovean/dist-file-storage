@@ -3,7 +3,6 @@ syntax = "proto3";
 package dist_file_storage;
 
 import "google/protobuf/empty.proto";
-import "google/protobuf/timestamp.proto";
 
 option go_package = ".;api";
 
@@ -50,4 +49,17 @@ message GetFileDownloadInfoV1Response {
 
 message CancelUploadV1Request {
   string filename = 1;
+}
+
+service FileManagementAdminService {
+  rpc AddStorageV1 (AddStorageV1Request) returns (AddStorageV1Response);
+}
+
+message AddStorageV1Request {
+  string addr = 1;
+  uint64 space_available_bytes = 2;
+}
+
+message AddStorageV1Response {
+  int32 id = 1;
 }

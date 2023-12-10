@@ -22,13 +22,19 @@ type Transport struct {
 	c      Config
 }
 
-func NewTransport(s internal.FileManagementService, c Config) *Transport {
+func NewTransport(
+	s internal.FileManagementService,
+	admS internal.FileManagementAdminService,
+	c Config,
+) *Transport {
 	server := grpc.NewServer()
 
 	reflection.Register(server)
 
 	fmsHandler := handler.NewFileManagementService(s)
+	fmasHandler := handler.NewFileManagementAdminService(admS)
 	api.RegisterFileManagementServiceServer(server, fmsHandler)
+	api.RegisterFileManagementAdminServiceServer(server, fmasHandler)
 
 	return &Transport{server: server, c: c}
 }

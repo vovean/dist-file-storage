@@ -124,3 +124,16 @@ func (m *FileManagement) GetFileDownloadInfo(ctx context.Context, filename strin
 
 	return parts, nil
 }
+
+func (m *FileManagement) AddStorage(ctx context.Context, storage domain.Storage) (domain.Storage, error) {
+	if _, err := m.storageRegistry.Add(ctx, storage.Address); err != nil {
+		return domain.Storage{}, errors.Wrap(err, "cannot connect to storage")
+	}
+
+	st, err := m.storageRepo.AddStorage(ctx, storage)
+	if err != nil {
+		return domain.Storage{}, errors.Wrap(err, "storage repository")
+	}
+
+	return st, nil
+}
