@@ -16,7 +16,7 @@ func (h httpHandler) Upload(w http.ResponseWriter, req *http.Request) {
 
 	contentLength := req.ContentLength
 	if contentLength <= 0 {
-		http.Error(w, "ContentLength not set", http.StatusLengthRequired)
+		http.Error(w, "Content-Length not set", http.StatusLengthRequired)
 		return
 	}
 

@@ -78,6 +78,7 @@ services:
   storage4: *default_storage
   storage5: *default_storage
   storage6: *default_storage
+  storage7: *default_storage
 
 
 

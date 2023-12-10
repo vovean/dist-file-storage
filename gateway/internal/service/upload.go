@@ -27,56 +27,66 @@ func (s *Service) Upload(ctx context.Context, req domain.UploadFileRequest, r io
 	partitionedReader := NewReaderPartitioner(r, partsSizes)
 
 	for _, p := range fileParts {
-		p := p // чтобы использовать в defer ниже
-
-		storage, err := s.storages.GetOrAdd(ctx, p.Storage)
-		if err != nil {
-			return errors.Wrapf(err, "get or add storage %s", p.Storage)
-		}
-
-		readerPart, err := partitionedReader.NextPart()
-		if err != nil {
-			return errors.Wrap(err, "get corresponding reader part")
-		}
-
-		// Создаем stream в хранилище и не забываем закрыть его потом
-		stream, err := storage.StoreV1(ctx)
-		if err != nil {
-			return errors.Wrapf(err, "open stream to storage %s", p.Storage)
-		}
-		closed := false
-		defer func() { // Goland ругвется, но здесь правда нужен defer в цикле, чтоб закрыть все стримы
-			if closed {
-				return
-			}
-			if _, err := stream.CloseAndRecv(); err != nil {
-				log.Printf("error closing stream for storage %s", p.Storage)
-			}
-		}()
-
-		// Пробуем загрузить файл в хранилище. Если не получилось - отменяем загрузку файла в FMS
-		if err := s.sendFilePartToStorage(p, readerPart, stream); err != nil {
+		if err := s.uploadFilePartToStorage(ctx, req.Filename, p, partitionedReader); err != nil {
+			// при ошибке загрузки любой из частей отменяем загрузку в FMS
 			err = goerrors.Join(err, s.cancelUpload(ctx, req.Filename))
-			return errors.Wrapf(err, "send file part (%d) to storage", p.PartId)
-		}
-
-		// Закрываем stream с хранилищем
-		if _, err := stream.CloseAndRecv(); err != nil {
-			err = goerrors.Join(err, s.cancelUpload(ctx, req.Filename))
-			return errors.Wrapf(err, "error closing stream for storage %s", p.Storage)
-		}
-		closed = true
-
-		// Сообщаем FMS, что загрузили часть файла
-		uploadProgress := &api.ReportUploadProgressV1Request{
-			Filename: req.Filename,
-			PartId:   int32(p.PartId),
-		}
-		if _, err := s.fms.ReportUploadProgressV1(ctx, uploadProgress); err != nil {
-			return errors.Wrapf(err, "report upload progress for part %d", p.PartId)
+			return errors.Wrapf(err, "send part %d of file %s to storage", p.PartId, req.Filename)
 		}
 	}
 
+	return nil
+}
+
+func (s *Service) uploadFilePartToStorage(
+	ctx context.Context,
+	filename string,
+	p domain.FilePart,
+	partitionedReader *ReaderPartitioner,
+) error {
+	storage, err := s.storages.GetOrAdd(ctx, p.Storage)
+	if err != nil {
+		return errors.Wrapf(err, "get or add storage %s", p.Storage)
+	}
+
+	readerPart, err := partitionedReader.NextPart()
+	if err != nil {
+		return errors.Wrap(err, "get corresponding reader part")
+	}
+
+	// Создаем stream в хранилище и не забываем закрыть его потом
+	stream, err := storage.StoreV1(ctx)
+	if err != nil {
+		return errors.Wrapf(err, "open stream to storage %s", p.Storage)
+	}
+	closed := false
+	defer func() {
+		if closed {
+			return
+		}
+		if _, err := stream.CloseAndRecv(); err != nil {
+			log.Printf("error closing stream for storage %s", p.Storage)
+		}
+	}()
+
+	// Пробуем загрузить файл в хранилище.
+	if err := s.sendFilePartToStorage(p, readerPart, stream); err != nil {
+		return errors.Wrapf(err, "send file part (%d) to storage", p.PartId)
+	}
+
+	// Закрываем stream с хранилищем
+	if _, err := stream.CloseAndRecv(); err != nil {
+		return errors.Wrapf(err, "error closing stream for storage %s", p.Storage)
+	}
+	closed = true
+
+	// Сообщаем FMS, что загрузили часть файла
+	uploadProgress := &api.ReportUploadProgressV1Request{
+		Filename: filename,
+		PartId:   int32(p.PartId),
+	}
+	if _, err := s.fms.ReportUploadProgressV1(ctx, uploadProgress); err != nil {
+		return errors.Wrapf(err, "report upload progress for part %d", p.PartId)
+	}
 	return nil
 }
 
