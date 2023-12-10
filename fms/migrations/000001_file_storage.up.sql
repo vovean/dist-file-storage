@@ -18,7 +18,7 @@ create table if not exists fileparts
     file            bigint not null references files (id),
     storage         int    not null references storages (id),
     size            bigint not null,
-    path_in_storage text   not null,
+    path_in_storage text   not null unique,
     is_stored       bool   not null default false,
 
     primary key (file, part_no)

@@ -38,7 +38,6 @@ func (b ByFreeSpaceStrategy) Partition(file domain.FullFileInfo, parts uint, sto
 
 	fileParts := make([]domain.FilePart, 0, parts)
 	remainingSize := file.Size
-
 	for i := 0; i < int(parts); i++ {
 		// Распределяем размер частей пропорционально свободному месту в хранилищах
 		proportion := float64(storages[i].SpaceAvailableBytes) / float64(totalSpace)
@@ -55,12 +54,16 @@ func (b ByFreeSpaceStrategy) Partition(file domain.FullFileInfo, parts uint, sto
 		remainingSize -= partSize
 	}
 
-	// Из-за округлений могло остаться < N байтов, где N - кол-во частей. Попробуем впихнуть куда сможем
+	// Из-за округлений могло остаться < N байтов, где N - кол-во частей. Попробуем впихнуть куда сможем, возможно, в несколько хранилищ
 	if remainingSize > 0 {
 		for i, p := range fileParts {
-			if p.Storage.SpaceAvailableBytes-p.Size >= remainingSize {
-				fileParts[i].Size += remainingSize
-				remainingSize = 0
+			availableSpace := p.Storage.SpaceAvailableBytes - p.Size
+			if availableSpace > 0 {
+				additionalSize := min(availableSpace, remainingSize)
+				fileParts[i].Size += additionalSize
+				remainingSize -= additionalSize
+			}
+			if remainingSize == 0 {
 				break
 			}
 		}

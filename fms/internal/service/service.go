@@ -9,6 +9,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -84,17 +85,28 @@ func (m *FileManagement) CancelUpload(ctx context.Context, filename string) erro
 	}
 
 	// Удаляем части из всех хранилищ
+	var eg errgroup.Group
 	for _, p := range parts {
-		storageClient, err := m.storageRegistry.GetOrAdd(ctx, p.Storage.Address)
-		if err != nil {
-			log.Printf("cannot get storage %s\n", p.Storage.Address)
-			return errors.Wrapf(err, "get storage %s", p.Storage.Address)
-		}
+		p := p
 
-		if _, err := storageClient.DeleteV1(ctx, &api.DeleteV1Request{Path: p.Path}); err != nil {
-			log.Printf("cannot delete from storage %s by path %s\n", p.Storage.Address, p.Path)
-			return errors.Wrapf(err, "delete from storage %s by path %s", p.Storage.Address, p.Path)
-		}
+		eg.Go(func() error {
+			storageClient, err := m.storageRegistry.GetOrAdd(ctx, p.Storage.Address)
+			if err != nil {
+				log.Printf("cannot get storage %s\n", p.Storage.Address)
+				return errors.Wrapf(err, "get storage %s", p.Storage.Address)
+			}
+
+			if _, err := storageClient.DeleteV1(ctx, &api.DeleteV1Request{Path: p.Path}); err != nil {
+				log.Printf("cannot delete from storage %s by path %s\n", p.Storage.Address, p.Path)
+				return errors.Wrapf(err, "delete from storage %s by path %s", p.Storage.Address, p.Path)
+			}
+
+			return nil
+		})
+	}
+
+	if err := eg.Wait(); err != nil {
+		return err
 	}
 
 	// После этого удаляем из базы (именно в таком порядке!)
