@@ -2,11 +2,11 @@ server:
   port: 8080
 
 uploader:
-  chunk_size_bytes: 10kb
+  chunk_size: 10kb
   timeout: 10m
 
 downloader:
-  chunk_size_bytes: 10kb
+  chunk_size: 10kb
   timeout: 10m
 
 fms:

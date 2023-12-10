@@ -11,12 +11,12 @@ type Config struct {
 	} `yaml:"server"`
 
 	Uploader struct {
-		ChunkSize config.DataSize `yaml:"chunk_size_bytes" env:"UPLOADER_CHUNKSIZE"`
+		ChunkSize config.DataSize `yaml:"chunk_size" env:"UPLOADER_CHUNKSIZE"`
 		Timeout   time.Duration   `yaml:"timeout" env:"UPLOADER_TIMEOUT"`
 	} `yaml:"uploader"`
 
 	Downloader struct {
-		ChunkSize config.DataSize `yaml:"chunk_size_bytes" env:"DOWNLOADER_CHUNKSIZE"`
+		ChunkSize config.DataSize `yaml:"chunk_size" env:"DOWNLOADER_CHUNKSIZE"`
 		Timeout   time.Duration   `yaml:"timeout" env:"DOWNLOADER_TIMEOUT"`
 	} `yaml:"downloader"`
 

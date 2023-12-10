@@ -13,5 +13,5 @@ type FileManagementService interface {
 }
 
 type FileManagementAdminService interface {
-	AddStorage(ctx context.Context, storage domain.Storage) (domain.Storage, error)
+	AddStorage(ctx context.Context, addr string) (domain.Storage, error)
 }

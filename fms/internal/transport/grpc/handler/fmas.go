@@ -4,7 +4,6 @@ import (
 	"api/api"
 	"context"
 	"fms/internal"
-	"fms/internal/domain"
 	"log"
 
 	"google.golang.org/grpc/codes"
@@ -20,10 +19,7 @@ func NewFileManagementAdminService(s internal.FileManagementAdminService) *FileM
 }
 
 func (s *FileManagementAdminService) AddStorageV1(ctx context.Context, req *api.AddStorageV1Request) (*api.AddStorageV1Response, error) {
-	st, err := s.s.AddStorage(ctx, domain.Storage{
-		Address:             req.GetAddr(),
-		SpaceAvailableBytes: req.GetSpaceAvailableBytes(),
-	})
+	st, err := s.s.AddStorage(ctx, req.GetAddr())
 	if err != nil {
 		log.Printf("error adding storage: %v\n", err)
 		return nil, status.Error(codes.Internal, "internal error")

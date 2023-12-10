@@ -9,6 +9,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type FileManagement struct {
@@ -125,12 +126,21 @@ func (m *FileManagement) GetFileDownloadInfo(ctx context.Context, filename strin
 	return parts, nil
 }
 
-func (m *FileManagement) AddStorage(ctx context.Context, storage domain.Storage) (domain.Storage, error) {
-	if _, err := m.storageRegistry.Add(ctx, storage.Address); err != nil {
+func (m *FileManagement) AddStorage(ctx context.Context, addr string) (domain.Storage, error) {
+	storageClient, err := m.storageRegistry.Add(ctx, addr)
+	if err != nil {
 		return domain.Storage{}, errors.Wrap(err, "cannot connect to storage")
 	}
 
-	st, err := m.storageRepo.AddStorage(ctx, storage)
+	info, err := storageClient.InfoV1(ctx, &emptypb.Empty{})
+	if err != nil {
+		return domain.Storage{}, errors.Wrap(err, "cannot get storage info")
+	}
+
+	st, err := m.storageRepo.AddStorage(ctx, domain.Storage{
+		Address:             addr,
+		SpaceAvailableBytes: info.GetSize(),
+	})
 	if err != nil {
 		return domain.Storage{}, errors.Wrap(err, "storage repository")
 	}
