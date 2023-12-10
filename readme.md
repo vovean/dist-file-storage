@@ -285,6 +285,7 @@ docker-compose -f docker-compose.yml up -d
 ```
 
 Пример ожидаемого вывода:
+
 ![](docs/images/docker-compose-up.png)
 
 Таким образом поднимутся:
@@ -320,6 +321,7 @@ go run cli add-storage --fms localhost:8080 --storage storage1:8080
 ```
 
 Пример ожидаемого вывода
+
 ![](docs/images/add-storage-cli.png)
 
 Нужно повторить это как минимум для 6 хранилищ. После этого можно загружать и скачивать файлы
@@ -338,6 +340,7 @@ go run cli upload --file docs/files/author.jpg --gateway http://localhost:8081
 ```
 
 Пример вывода:
+
 ![](docs/images/cli-upload.png)
 
 Обратите внимание, что cli также выводит md5 отправленного файла для удобства пользователя
@@ -353,6 +356,7 @@ md5 downloaded.jpg
 ```
 
 Пример вывода:
+
 ![](docs/images/cli-download.png)
 
 ### CLI утилита и Postman
