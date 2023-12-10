@@ -1,0 +1,86 @@
+version: "3.9"
+
+x-default-storage: &default_storage
+  build:
+    context: .
+    dockerfile: dockerfiles/storage.Dockerfile
+  environment:
+    SERVER_PORT: 8080
+    STORAGE_ROOT: /tmp/storage
+    STORAGE_SIZE: 100mb
+    API_SERVECHUNKSIZE: 100kb
+  volumes:
+    - "./storage_data:/tmp/storage"
+  networks: [ "microservices" ]
+
+services:
+  fms_postgres:
+    image: postgres:16
+    container_name: fms_postgres
+    command: [ "postgres", "-c", "log_statement=all" ]
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fms
+    ports:
+      - "5432:5432"
+    volumes: # можно подложить миграции, а можно прогнать их руками через gomigrate
+      - "./fms/migrations/000001_file_storage.up.sql:/docker-entrypoint-initdb.d/init1.sql"
+      - "./pg_data:/var/lib/postgresql/data"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "fms" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [ "microservices" ]
+
+  fms:
+    build:
+      context: .
+      dockerfile: dockerfiles/fms.Dockerfile
+    environment:
+      SERVER_PORT: 8080
+      DB_HOST: fms_postgres
+      DB_PORT: 5432
+      DB_DBNAME: fms
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+    healthcheck:
+      # в рамках тестового ограничимся простым слипом, в проде сделал бы localhost:8080/health
+      test: [ "CMD", "sleep", "3" ]
+      interval: 5s
+    depends_on:
+      fms_postgres:
+        condition: service_healthy
+    networks: [ "microservices" ]
+
+  gateway:
+    build:
+      context: .
+      dockerfile: dockerfiles/gateway.Dockerfile
+    environment:
+      SERVER_PORT: 8081
+      FMS_HOST: fms
+      FMS_PORT: 8080
+    ports:
+      - "8081:8081"
+    depends_on:
+      fms:
+        condition: service_healthy
+    networks: [ "microservices" ]
+
+  # при таком подходе все хранилища будут писать в ./storage_data, но там не будет коллизий, так что не проблема
+  storage1: *default_storage
+  storage2: *default_storage
+  storage3: *default_storage
+  storage4: *default_storage
+  storage5: *default_storage
+  storage6: *default_storage
+
+
+
+networks:
+  microservices:
+    name: microservices

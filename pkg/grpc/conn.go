@@ -22,7 +22,7 @@ func NewConnection(ctx context.Context, addr string, opts ...grpc.DialOption) (*
 
 	conn, err := grpc.DialContext(ctx, addr, opts...)
 	if err != nil {
-		return nil, errors.Wrap(err, "grpc dial")
+		return nil, errors.Wrapf(err, "grpc dial %s", addr)
 	}
 
 	return conn, nil

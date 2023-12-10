@@ -105,3 +105,6 @@ fabric.properties
 !.idea/runConfigurations
 
 # End of https://www.toptal.com/developers/gitignore/api/goland+all,git
+
+pg_data
+storage_data

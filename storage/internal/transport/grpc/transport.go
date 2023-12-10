@@ -38,7 +38,7 @@ func (t *Transport) Run(ctx context.Context) error {
 	go func() {
 		defer transportCancel()
 
-		lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", t.c.Port))
+		lis, err := net.Listen("tcp", fmt.Sprintf(":%d", t.c.Port))
 		if err != nil {
 			log.Printf("failed to listen: %v", err)
 			return

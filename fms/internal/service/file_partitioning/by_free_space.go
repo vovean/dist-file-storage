@@ -2,6 +2,7 @@ package file_partitioning
 
 import (
 	"fms/internal/domain"
+	"log"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -16,6 +17,7 @@ func (b ByFreeSpaceStrategy) Partition(file domain.FullFileInfo, parts uint, sto
 	}
 
 	if len(storages) < int(parts) {
+		log.Printf("currently there are %d/%d storages", len(storages), parts)
 		return nil, domain.ErrNotEnoughStorages
 	}
 
